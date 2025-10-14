@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { nanoid } from 'nanoid';
 
 const TaskContext = createContext(null);
@@ -8,6 +8,7 @@ export function TaskProvider({ children }) {
   // 🔴 STATE SETUP - PROBLEM 1: Multiple useState calls
   // ==========================================
   const [tasks, setTasks] = useState([]);
+  const isFirstRender = useRef(true); // Track first render to prevent localStorage race condition
   const [filters, setFilters] = useState({
     status: 'all',      // 'all' | 'active' | 'completed'
     category: 'all',    // 'all' | 'work' | 'personal' | 'shopping'
@@ -27,7 +28,9 @@ export function TaskProvider({ children }) {
   // ⚠️ Use spread operator to maintain immutability
   const addTask = (task) => {
     // YOUR CODE HERE
-    // Hint: setTasks(prevTasks => [...prevTasks, { ...task, id: nanoid(), ... }])
+    // Hint: setTasks(prevTasks => [...prevTasks, { ...task, id: nanoid(), createdAt: Date.now(), completed: false }])
+
+    setTasks(prevTasks => [...prevTasks, { ...task, id: nanoid(), createdAt: Date.now(), completed: false }]);
   };
 
   // TODO: Implement updateTask function
@@ -38,6 +41,8 @@ export function TaskProvider({ children }) {
   const updateTask = (id, updates) => {
     // YOUR CODE HERE
     // Hint: setTasks(prevTasks => prevTasks.map(task => task.id === id ? {...task, ...updates} : task))
+
+    setTasks(prevTasks => prevTasks.map(task => task.id === id ? { ...task, ...updates } : task));
   };
 
   // TODO: Implement deleteTask function
@@ -47,6 +52,8 @@ export function TaskProvider({ children }) {
   const deleteTask = (id) => {
     // YOUR CODE HERE
     // Hint: setTasks(prevTasks => prevTasks.filter(task => task.id !== id))
+
+    setTasks(prevTask => prevTask.filter(task => task.id !== id));
   };
 
   // TODO: Implement toggleTask function
@@ -56,6 +63,8 @@ export function TaskProvider({ children }) {
   const toggleTask = (id) => {
     // YOUR CODE HERE
     // Hint: Similar to updateTask but toggle completed property
+
+    setTasks(prevTasks => prevTasks.map(task => task.id === id ? { ...task, completed: !task.completed } : task));
   };
 
   // TODO: Implement clearCompleted function
@@ -63,6 +72,7 @@ export function TaskProvider({ children }) {
   // 1. Remove all completed tasks
   const clearCompleted = () => {
     // YOUR CODE HERE
+    setTasks(prevTasks => (prevTasks.filter(task => task.completed === false)));
   };
 
   // ==========================================
@@ -76,6 +86,8 @@ export function TaskProvider({ children }) {
   const setStatusFilter = (status) => {
     // YOUR CODE HERE
     // Hint: setFilters(prevFilters => ({ ...prevFilters, status: status }))
+
+    setFilters(prevFilter => ({ ...prevFilter, status: status }));
   };
 
   // TODO: Implement setCategoryFilter
@@ -83,6 +95,7 @@ export function TaskProvider({ children }) {
   // 1. Update filters.category property
   const setCategoryFilter = (category) => {
     // YOUR CODE HERE
+    setFilters(prevFilter => ({ ...prevFilter, category: category }));
   };
 
   // TODO: Implement setSearchFilter
@@ -90,6 +103,7 @@ export function TaskProvider({ children }) {
   // 1. Update filters.search property
   const setSearchFilter = (search) => {
     // YOUR CODE HERE
+    setFilters(prevFilter => ({ ...prevFilter, search: search }));
   };
 
   // TODO: Implement resetFilters
@@ -97,6 +111,11 @@ export function TaskProvider({ children }) {
   // 1. Reset all filters to default values
   const resetFilters = () => {
     // YOUR CODE HERE
+    setFilters({
+      status: 'all',
+      category: 'all',
+      search: ''
+    });
   };
 
   // ==========================================
@@ -112,15 +131,34 @@ export function TaskProvider({ children }) {
   useEffect(() => {
     // YOUR CODE HERE
     // Hint: localStorage.getItem(), JSON.parse(), try-catch
+    try {
+        const storedTasks = localStorage.getItem('taskflow-tasks');
+        if (storedTasks) {
+            const parsedTasks = JSON.parse(storedTasks);
+            setTasks(parsedTasks);
+        }
+    } catch (error) {
+        console.log("Error loading tasks from localStorage", error);
+    }
   }, []); // Empty dependency array = run once
 
   // TODO: Save tasks to localStorage whenever tasks change
   // Requirements:
   // 1. Stringify tasks and save to localStorage
   // ⚠️ PROBLEM: This runs on EVERY render when tasks change!
+  // ⚠️ BUG FIX: Don't save on first render (prevents overwriting loaded data)
   useEffect(() => {
     // YOUR CODE HERE
     // Hint: localStorage.setItem('taskflow-tasks', JSON.stringify(tasks))
+    
+    // Skip the first render to prevent race condition
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    
+    localStorage.setItem('taskflow-tasks', JSON.stringify(tasks));
+    console.log('💾 Saved to localStorage:', tasks.length, 'tasks');
   }, [tasks]); // Runs whenever tasks array changes
 
   // ==========================================
@@ -148,8 +186,8 @@ export function TaskProvider({ children }) {
     resetFilters,
   };
 
-  // 🔴 Add console.log to see re-render spam
-  console.log('🔴 TaskProvider re-rendered');
+  // 🔴 UNCOMMENTED: Watch the re-render SPAM!
+  console.log('🔴 TaskProvider re-rendered - ENTIRE CONTEXT UPDATES!');
 
   return <TaskContext.Provider value={value}>{children}</TaskContext.Provider>;
 }

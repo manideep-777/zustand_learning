@@ -5,14 +5,18 @@ function TaskCounter() {
   // Even though it only needs the tasks array!
   const { tasks } = useTasks();
 
-  // Add console.log to track unnecessary re-renders
-  console.log('🔴 TaskCounter re-rendered');
+  // 🔴 UNCOMMENTED: This component re-renders even when filters change!
+  console.log('🔴 TaskCounter re-rendered - only needs tasks array but re-renders for EVERYTHING!');
 
   // TODO: Calculate these values
   // Hint: Use tasks.length and tasks.filter()
-  const totalTasks = 0; // YOUR CODE: Count total tasks
-  const activeTasks = 0; // YOUR CODE: Count tasks where completed === false
-  const completedTasks = 0; // YOUR CODE: Count tasks where completed === true
+
+  // YOUR CODE: Count total tasks
+  const totalTasks = tasks.length; 
+  // YOUR CODE: Count tasks where completed === false
+  const activeTasks = tasks.filter(task => task.completed===false).length; 
+  // YOUR CODE: Count tasks where completed === true
+  const completedTasks = tasks.filter(task => task.completed === true).length; 
 
   return (
     <div className="task-counter">

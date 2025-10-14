@@ -6,32 +6,36 @@ function TaskList() {
   // If multiple components need filtered tasks, you have to duplicate this!
   const { tasks, filters } = useTasks();
 
-  console.log('🔴 TaskList re-rendered');
+  // 🔴 UNCOMMENTED: Watch this spam when you type in search!
+  console.log('🔴 TaskList re-rendered - filtering all tasks again!');
 
   // TODO: Implement filtering logic
   // Requirements:
   // 1. Filter by status (all, active, completed)
   // 2. Filter by category (all, work, personal, shopping)
   // 3. Filter by search (check if title or description includes search text)
-  // Hint: Chain multiple .filter() calls or use one with multiple conditions
   
-  const filteredTasks = tasks; // REPLACE THIS with your filtering logic
-  
-  // YOUR CODE HERE
-  // Example structure:
-  // const filteredTasks = tasks.filter(task => {
-  //   // Status filter
-  //   if (filters.status === 'active' && task.completed) return false;
-  //   if (filters.status === 'completed' && !task.completed) return false;
-  //   
-  //   // Category filter
-  //   // ...
-  //   
-  //   // Search filter
-  //   // ...
-  //   
-  //   return true;
-  // });
+  const filteredTasks = tasks.filter(task => {
+    // Status filter
+    if (filters.status === 'active' && task.completed) return false;
+    if (filters.status === 'completed' && !task.completed) return false;
+    
+    // Category filter
+    if (filters.category !== 'all' && task.category !== filters.category) return false;
+    
+    // Search filter - check both title and description
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
+      const titleMatch = task.title.toLowerCase().includes(searchLower);
+      const descriptionMatch = task.description?.toLowerCase().includes(searchLower);
+      
+      if (!titleMatch && !descriptionMatch) return false;
+    }
+    
+    return true;
+  });
+
+
 
   return (
     <div className="task-list-container">

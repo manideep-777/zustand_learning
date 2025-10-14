@@ -4,7 +4,8 @@ function FilterBar() {
   // 🔴 PROBLEM: Gets entire context, re-renders on ANY change
   const { filters, setStatusFilter, setCategoryFilter, setSearchFilter, resetFilters } = useTasks();
 
-  console.log('🔴 FilterBar re-rendered');
+  // 🔴 UNCOMMENTED: This re-renders when tasks change even though it doesn't use tasks!
+  console.log('🔴 FilterBar re-rendered - why? It only uses filters!');
 
   return (
     <div className="filter-bar">

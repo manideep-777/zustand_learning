@@ -5,7 +5,8 @@ function TaskItem({ task }) {
   // Even though it only cares about THIS specific task!
   const { toggleTask, deleteTask } = useTasks();
 
-  console.log(`🔴 TaskItem (${task.title}) re-rendered`);
+  // 🔴 UNCOMMENTED: Watch ALL task items re-render when you change ONE!
+  console.log(`🔴 TaskItem "${task.title}" (id: ${task.id.slice(0, 8)}...) re-rendered`);
 
   // Format date if exists
   const formatDate = (dateString) => {
