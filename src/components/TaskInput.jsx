@@ -1,11 +1,15 @@
 import { useState } from 'react';
-import { useTasks } from '../context/TaskContext';
+// 🧪 TEMPORARY: Import Zustand store to test it
+import useTaskStore from '../store/taskStore';
 
 function TaskInput() {
-    const { addTask } = useTasks();
+    const addTask = useTaskStore((state) => state.addTask);
+
+    // 🧪 TEMPORARY: Test if Zustand store works
+    // console.log('🧪 Testing Zustand Store:', useTaskStore.getState());
 
     // 🔴 UNCOMMENTED: This re-renders even though it only needs addTask function!
-    console.log('🔴 TaskInput re-rendered - only needs addTask but context changed!');
+    console.log('✅ TaskInput re-rendered - using Zustand selector!');
 
     // ✅ LOCAL STATE: This is fine! Form state should be local
     const [formData, setFormData] = useState({
