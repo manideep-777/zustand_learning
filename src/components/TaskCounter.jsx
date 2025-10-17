@@ -1,12 +1,12 @@
-import { useTasks } from '../context/TaskContext';
+import useTaskStore from "../store/taskStore";
 
 function TaskCounter() {
   // 🔴 PROBLEM: This component re-renders whenever ANY task or filter changes
   // Even though it only needs the tasks array!
-  const { tasks } = useTasks();
+  const tasks = useTaskStore((state) => state.tasks);
 
   // 🔴 UNCOMMENTED: This component re-renders even when filters change!
-  console.log('🔴 TaskCounter re-rendered - only needs tasks array but re-renders for EVERYTHING!');
+  console.log('✅ TaskCounter re-rendered - Zustand selector for tasks only!');
 
   // TODO: Calculate these values
   // Hint: Use tasks.length and tasks.filter()

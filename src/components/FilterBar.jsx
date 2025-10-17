@@ -1,11 +1,15 @@
-import { useTasks } from '../context/TaskContext';
+import useTaskStore from "../store/taskStore";
 
 function FilterBar() {
   // 🔴 PROBLEM: Gets entire context, re-renders on ANY change
-  const { filters, setStatusFilter, setCategoryFilter, setSearchFilter, resetFilters } = useTasks();
+  const filters = useTaskStore((state) => state.filters);
+  const setStatusFilter = useTaskStore((state) => state.setStatusFilter);
+  const setCategoryFilter = useTaskStore((state) => state.setCategoryFilter);
+  const setSearchFilter = useTaskStore((state) => state.setSearchFilter);
+  const resetFilters = useTaskStore((state) => state.resetFilters);
 
   // 🔴 UNCOMMENTED: This re-renders when tasks change even though it doesn't use tasks!
-  console.log('🔴 FilterBar re-rendered - why? It only uses filters!');
+  console.log('✅ FilterBar re-rendered - Zustand selectors!');
 
   return (
     <div className="filter-bar">

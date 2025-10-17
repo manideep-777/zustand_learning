@@ -1,12 +1,13 @@
-import { useTasks } from '../context/TaskContext';
+import useTaskStore from "../store/taskStore";
 
 function TaskItem({ task }) {
-  // 🔴 PROBLEM: This component re-renders when OTHER tasks change
-  // Even though it only cares about THIS specific task!
-  const { toggleTask, deleteTask } = useTasks();
+  // ✅ FIXED: Using separate selectors for optimal performance
+  // Each selector has a stable reference - only re-renders if these functions change (they won't!)
+  const toggleTask = useTaskStore((state) => state.toggleTask);
+  const deleteTask = useTaskStore((state) => state.deleteTask);
 
   // 🔴 UNCOMMENTED: Watch ALL task items re-render when you change ONE!
-  console.log(`🔴 TaskItem "${task.title}" (id: ${task.id.slice(0, 8)}...) re-rendered`);
+  console.log(`✅ TaskItem "${task.title}" (id: ${task.id.slice(0, 8)}...) - Zustand selector`);
 
   // Format date if exists
   const formatDate = (dateString) => {

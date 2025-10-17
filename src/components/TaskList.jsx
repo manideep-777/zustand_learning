@@ -1,13 +1,13 @@
-import { useTasks } from '../context/TaskContext';
+import useTaskStore from '../store/taskStore';
 import TaskItem from './TaskItem';
 
 function TaskList() {
   // 🔴 PROBLEM: This component needs to do filtering logic itself
   // If multiple components need filtered tasks, you have to duplicate this!
-  const { tasks, filters } = useTasks();
-
+  const tasks = useTaskStore((state) => state.tasks);
+  const filters = useTaskStore((state) => state.filters);
   // 🔴 UNCOMMENTED: Watch this spam when you type in search!
-  console.log('🔴 TaskList re-rendered - filtering all tasks again!');
+  console.log('✅ TaskList re-rendered - using Zustand selectors!');
 
   // TODO: Implement filtering logic
   // Requirements:
