@@ -7,7 +7,7 @@
 import { create } from 'zustand';
 import { nanoid } from 'nanoid';
 import { immer } from 'zustand/middleware/immer';
-import { persist } from 'zustand/middleware';
+import { persist, devtools } from 'zustand/middleware';
 
 // ==========================================
 // 📝 STEP 1: Create basic store (WITHOUT Immer)
@@ -134,57 +134,86 @@ import { persist } from 'zustand/middleware';
 
 
 const useTaskStore = create(
-    persist(
-        immer((set, get) => ({
-            tasks: [],
-            filters: {
-                status: 'all',      // 'all' | 'active' | 'completed'
-                category: 'all',    // 'all' | 'work' | 'personal' | 'shopping'
-                search: ''
-            },
+    devtools(
+        persist(
+            immer((set, get) => ({
+                tasks: [],
+                filters: {
+                    status: 'all',      // 'all' | 'active' | 'completed'
+                    category: 'all',    // 'all' | 'work' | 'personal' | 'shopping'
+                    search: ''
+                },
 
-            addTask: (task) => set((state) => {
-                state.tasks.push({ ...task, id: nanoid(), createdAt: Date.now(), completed: false });
-            }),
+                addTask: (task) => set((state) => {
+                    state.tasks.push({ ...task, id: nanoid(), createdAt: Date.now(), completed: false });
+                },
+                    false,
+                    'tasks/add'
+                ),
 
-            updateTask: (id, updates) => set((state) => {
-                const task = state.tasks.find(t => t.id === id);
-                Object.assign(task, updates);
-            }),
+                updateTask: (id, updates) => set((state) => {
+                    const task = state.tasks.find(t => t.id === id);
+                    Object.assign(task, updates);
+                },
+                    false,
+                    'tasks/update'
+                ),
 
-            deleteTask: (id) => set((state) => {
-                const index = state.tasks.findIndex(t => t.id === id);
-                state.tasks.splice(index, 1);
-            }),
+                deleteTask: (id) => set((state) => {
+                    const index = state.tasks.findIndex(t => t.id === id);
+                    state.tasks.splice(index, 1);
+                },
+                    false,
+                    'tasks/delete'
+                ),
 
-            toggleTask: (id) => set((state) => {
-                const task = state.tasks.find(t => t.id === id);
-                task.completed = !task.completed;
-            }),
+                toggleTask: (id) => set((state) => {
+                    const task = state.tasks.find(t => t.id === id);
+                    task.completed = !task.completed;
+                },
+                    false,
+                    'tasks/toggle'
+                ),
 
-            clearCompleted: () => set((state) => {
-                state.tasks = state.tasks.filter(task => task.completed === false);
-            }),
+                clearCompleted: () => set((state) => {
+                    state.tasks = state.tasks.filter(task => task.completed === false);
+                },
+                    false,
+                    'tasks/clearCompleted'
+                ),
 
-            setStatusFilter: (status) => set((state) => {
-                state.filters.status = status;
-            }),
+                setStatusFilter: (status) => set((state) => {
+                    state.filters.status = status;
+                },
+                    false,
+                    'filters/setStatus'
+                ),
 
-            setCategoryFilter: (category) => set((state) => {
-                state.filters.category = category;
-            }),
+                setCategoryFilter: (category) => set((state) => {
+                    state.filters.category = category;
+                },
+                    false,
+                    'filters/setCategory'
+                ),
 
-            setSearchFilter: (search) => set((state) => {
-                state.filters.search = search;
-            }),
+                setSearchFilter: (search) => set((state) => {
+                    state.filters.search = search;
+                },
+                    false,
+                    'filters/setSearch'
+                ),
 
-            resetFilters: () => set((state) => {
-                state.filters = { status: 'all', category: 'all', search: '' };
-            })
-        })),
-        {
-            name: 'taskflow-storage',  // ← localStorage key name
-        }
+                resetFilters: () => set((state) => {
+                    state.filters = { status: 'all', category: 'all', search: '' };
+                },
+                    false,
+                    'filters/reset'
+                )
+            })),
+            {
+                name: 'taskflow-storage',  // ← localStorage key name
+            }
+        )
     )
 );
 
