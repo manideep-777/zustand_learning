@@ -6,6 +6,7 @@
 
 import { create } from 'zustand';
 import { nanoid } from 'nanoid';
+import { immer } from 'zustand/middleware/immer';
 
 // ==========================================
 // 📝 STEP 1: Create basic store (WITHOUT Immer)
@@ -22,51 +23,51 @@ import { nanoid } from 'nanoid';
 
 // YOUR CODE HERE - Create the store
 
-const useTaskStore = create((set, get) => ({
-    tasks: [],
-    filters: {
-        status: 'all',      // 'all' | 'active' | 'completed'
-        category: 'all',    // 'all' | 'work' | 'personal' | 'shopping'
-        search: ''
-    },
+// const useTaskStore = create((set, get) => ({
+//     tasks: [],
+//     filters: {
+//         status: 'all',      // 'all' | 'active' | 'completed'
+//         category: 'all',    // 'all' | 'work' | 'personal' | 'shopping'
+//         search: ''
+//     },
 
-    addTask: (task) => set((state) => ({
-      tasks: [ ...state.tasks, { ...task, id: nanoid(), createdAt: Date.now(), completed: false } ],
-    })),
+//     addTask: (task) => set((state) => ({
+//       tasks: [ ...state.tasks, { ...task, id: nanoid(), createdAt: Date.now(), completed: false } ],
+//     })),
 
-    updateTask: (id, updates) => set((state) => ({
-        tasks: state.tasks.map(task => task.id === id ? { ...task, ...updates } : task)
-    })),
+//     updateTask: (id, updates) => set((state) => ({
+//         tasks: state.tasks.map(task => task.id === id ? { ...task, ...updates } : task)
+//     })),
 
-    deleteTask: (id) => set((state) => ({
-        tasks: state.tasks.filter(task => task.id !== id)
-    })),
+//     deleteTask: (id) => set((state) => ({
+//         tasks: state.tasks.filter(task => task.id !== id)
+//     })),
 
-    toggleTask: (id) => set((state) => ({
-        tasks: state.tasks.map(task => task.id === id ? { ...task, completed: !task.completed } : task)
-    })),
+//     toggleTask: (id) => set((state) => ({
+//         tasks: state.tasks.map(task => task.id === id ? { ...task, completed: !task.completed } : task)
+//     })),
 
-    clearCompleted: () => set((state) => ({
-        tasks: state.tasks.filter(task => task.completed === false)
-    })),
+//     clearCompleted: () => set((state) => ({
+//         tasks: state.tasks.filter(task => task.completed === false)
+//     })),
 
-    setStatusFilter: (status) => set((state) => ({
-        filters: { ...state.filters, status: status }
-    })),
+//     setStatusFilter: (status) => set((state) => ({
+//         filters: { ...state.filters, status: status }
+//     })),
 
-    setCategoryFilter: (category) => set((state) => ({
-        filters: { ...state.filters, category: category }
-    })),
+//     setCategoryFilter: (category) => set((state) => ({
+//         filters: { ...state.filters, category: category }
+//     })),
 
-    setSearchFilter: (search) => set((state) => ({
-        filters: { ...state.filters, search: search }
-    })),
+//     setSearchFilter: (search) => set((state) => ({
+//         filters: { ...state.filters, search: search }
+//     })),
 
-    resetFilters: () => set((state) => ({
-        filters: { status: 'all', category: 'all', search: '' }
-    }))
+//     resetFilters: () => set((state) => ({
+//         filters: { status: 'all', category: 'all', search: '' }
+//     }))
 
-}));
+// }));
 
 
 // ==========================================
@@ -130,6 +131,60 @@ const useTaskStore = create((set, get) => ({
 // - With Immer: state.filters = { status: 'all', ... };
 
 
+
+const useTaskStore = create(
+    immer((set, get) => ({
+        tasks: [],
+        filters: {
+            status: 'all',      // 'all' | 'active' | 'completed'
+            category: 'all',    // 'all' | 'work' | 'personal' | 'shopping'
+            search: ''
+        },
+
+        addTask: (task) => set((state) => {
+            state.tasks.push({ ...task, id: nanoid(), createdAt: Date.now(), completed: false });
+        }),
+
+        updateTask: (id, updates) => set((state) => {
+            const task = state.tasks.find(t => t.id === id);
+            Object.assign(task, updates);
+        }),
+
+        deleteTask: (id) => set((state) => {
+            const index = state.tasks.findIndex(t => t.id === id);
+            state.tasks.splice(index, 1);
+        }),
+
+        toggleTask: (id) => set((state) => {
+            const task = state.tasks.find(t => t.id === id);
+            task.completed = !task.completed;
+        }),
+
+        clearCompleted: () => set((state) => {
+            state.tasks = state.tasks.filter(task => task.completed === false);
+        }),
+
+        setStatusFilter: (status) => set((state) => {
+            state.filters.status = status;
+        }),
+
+        setCategoryFilter: (category) => set((state) => {
+            state.filters.category = category;
+        }),
+
+        setSearchFilter: (search) => set((state) => {
+            state.filters.search = search;
+        }),
+
+        resetFilters: () => set((state) => {
+            state.filters = { status: 'all', category: 'all', search: '' };
+        })
+
+    }))
+);
+
+
+
 // ==========================================
 // 🎓 LEARNING CHECKLIST - Mark as you complete:
 // ==========================================
@@ -178,7 +233,7 @@ export default useTaskStore;
 // ==========================================
 // Remove this after you finish testing!
 if (typeof window !== 'undefined') {
-  window.useTaskStore = useTaskStore;
+    window.useTaskStore = useTaskStore;
 }
 
 // ==========================================
