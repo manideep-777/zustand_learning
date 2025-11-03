@@ -12,11 +12,11 @@ function TaskCounter() {
   // Hint: Use tasks.length and tasks.filter()
 
   // YOUR CODE: Count total tasks
-  const totalTasks = tasks.length; 
+  const totalTasks: number = tasks.length;
   // YOUR CODE: Count tasks where completed === false
-  const activeTasks = tasks.filter(task => task.completed===false).length; 
+  const activeTasks: number = tasks.filter(task => task.completed === false).length;
   // YOUR CODE: Count tasks where completed === true
-  const completedTasks = tasks.filter(task => task.completed === true).length; 
+  const completedTasks: number = tasks.filter(task => task.completed === true).length;
 
   return (
     <div className="task-counter">

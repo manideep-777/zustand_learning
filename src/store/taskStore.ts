@@ -8,6 +8,7 @@ import { create } from 'zustand';
 import { nanoid } from 'nanoid';
 import { immer } from 'zustand/middleware/immer';
 import { persist, devtools } from 'zustand/middleware';
+import type { Task, TaskInput, TaskUpdate, FilterState, FilterStatus, FilterCategory } from '../types';
 
 // ==========================================
 // 📝 STEP 1: Create basic store (WITHOUT Immer)
@@ -131,12 +132,31 @@ import { persist, devtools } from 'zustand/middleware';
 // - Without Immer: set({ filters: { status: 'all', ... } })
 // - With Immer: state.filters = { status: 'all', ... };
 
+interface TaskStore {
+    // ===== State =====
+    tasks: Task[];
+    filters: FilterState;
+
+    // ===== Task Actions =====
+    addTask: (task: TaskInput) => void;
+    updateTask: (id: string, updates: TaskUpdate) => void;
+    deleteTask: (id: string) => void;
+    toggleTask: (id: string) => void;
+    clearCompleted: () => void;
+
+    // ===== Filter Actions =====
+    setStatusFilter: (status: FilterStatus) => void;
+    setCategoryFilter: (category: FilterCategory) => void;
+    setSearchFilter: (search: string) => void;
+    resetFilters: () => void;
+}
 
 
-const useTaskStore = create(
+
+const useTaskStore = create<TaskStore>()(
     devtools(
         persist(
-            immer((set, get) => ({
+            immer((set) => ({
                 tasks: [],
                 filters: {
                     status: 'all',      // 'all' | 'active' | 'completed'
@@ -151,10 +171,13 @@ const useTaskStore = create(
                     'tasks/add'
                 ),
 
-                updateTask: (id, updates) => set((state) => {
-                    const task = state.tasks.find(t => t.id === id);
-                    Object.assign(task, updates);
-                },
+                updateTask: (id, updates) => set(
+                    (state) => {
+                        const task = state.tasks.find(t => t.id === id);
+                        if (task) {
+                            Object.assign(task, updates);
+                        }
+                    },
                     false,
                     'tasks/update'
                 ),
@@ -169,7 +192,9 @@ const useTaskStore = create(
 
                 toggleTask: (id) => set((state) => {
                     const task = state.tasks.find(t => t.id === id);
-                    task.completed = !task.completed;
+                    if (task) {
+                        task.completed = !task.completed;
+                    }
                 },
                     false,
                     'tasks/toggle'
@@ -266,6 +291,13 @@ export default useTaskStore;
 // 🧪 TEMPORARY: Expose to browser console for testing
 // ==========================================
 // Remove this after you finish testing!
+
+declare global {
+    interface Window {
+        useTaskStore?: typeof useTaskStore;
+    }
+}
+
 if (typeof window !== 'undefined') {
     window.useTaskStore = useTaskStore;
 }

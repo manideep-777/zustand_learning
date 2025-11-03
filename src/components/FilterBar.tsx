@@ -1,4 +1,5 @@
 import useTaskStore from "../store/taskStore";
+import type { FilterStatus, FilterCategory } from '../types';
 
 function FilterBar() {
   // 🔴 PROBLEM: Gets entire context, re-renders on ANY change
@@ -11,6 +12,14 @@ function FilterBar() {
   // 🔴 UNCOMMENTED: This re-renders when tasks change even though it doesn't use tasks!
   console.log('✅ FilterBar re-rendered - Zustand selectors!');
 
+  const handleStatusChange = (status: FilterStatus) => {
+    setStatusFilter(status);
+  };
+
+  const handleCategoryChange = (category: FilterCategory) => {
+    setCategoryFilter(category);
+  };
+
   return (
     <div className="filter-bar">
       <div className="filter-grid">
@@ -20,19 +29,19 @@ function FilterBar() {
           <div className="filter-buttons">
             <button
               className={`btn-filter ${filters.status === 'all' ? 'active' : ''}`}
-              onClick={() => setStatusFilter('all')}
+              onClick={() => handleStatusChange('all')}
             >
               All
             </button>
             <button
               className={`btn-filter ${filters.status === 'active' ? 'active' : ''}`}
-              onClick={() => setStatusFilter('active')}
+              onClick={() => handleStatusChange('active')}
             >
               Active
             </button>
             <button
               className={`btn-filter ${filters.status === 'completed' ? 'active' : ''}`}
-              onClick={() => setStatusFilter('completed')}
+              onClick={() => handleStatusChange('completed')}
             >
               Completed
             </button>
@@ -45,25 +54,25 @@ function FilterBar() {
           <div className="filter-buttons">
             <button
               className={`btn-filter ${filters.category === 'all' ? 'active' : ''}`}
-              onClick={() => setCategoryFilter('all')}
+              onClick={() => handleCategoryChange('all')}
             >
               All
             </button>
             <button
               className={`btn-filter ${filters.category === 'work' ? 'active' : ''}`}
-              onClick={() => setCategoryFilter('work')}
+              onClick={() => handleCategoryChange('work')}
             >
               💼 Work
             </button>
             <button
               className={`btn-filter ${filters.category === 'personal' ? 'active' : ''}`}
-              onClick={() => setCategoryFilter('personal')}
+              onClick={() => handleCategoryChange('personal')}
             >
               🏠 Personal
             </button>
             <button
               className={`btn-filter ${filters.category === 'shopping' ? 'active' : ''}`}
-              onClick={() => setCategoryFilter('shopping')}
+              onClick={() => handleCategoryChange('shopping')}
             >
               🛒 Shopping
             </button>

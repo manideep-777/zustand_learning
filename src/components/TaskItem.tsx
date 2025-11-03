@@ -1,6 +1,11 @@
 import useTaskStore from "../store/taskStore";
+import type { Task } from '../types';
 
-function TaskItem({ task }) {
+interface TaskItemProps {
+  task: Task;
+}
+
+function TaskItem({ task }: TaskItemProps) {
   // ✅ FIXED: Using separate selectors for optimal performance
   // Each selector has a stable reference - only re-renders if these functions change (they won't!)
   const toggleTask = useTaskStore((state) => state.toggleTask);
@@ -10,20 +15,20 @@ function TaskItem({ task }) {
   console.log(`✅ TaskItem "${task.title}" (id: ${task.id.slice(0, 8)}...) - Zustand selector`);
 
   // Format date if exists
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: number | undefined): string | null => {
     if (!dateString) return null;
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
   // Format created date
-  const formatCreatedDate = (timestamp) => {
-    if (!timestamp) return '';
+  const formatCreatedDate = (timestamp: number | undefined): string => {
+    if (!timestamp) return "";
     const date = new Date(timestamp);
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
-  const categoryEmoji = {
+  const categoryEmoji: Record<Task['category'], string> = {
     work: '💼',
     personal: '🏠',
     shopping: '🛒'

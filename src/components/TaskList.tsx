@@ -1,5 +1,6 @@
 import useTaskStore from '../store/taskStore';
 import TaskItem from './TaskItem';
+import type { Task } from '../types';
 
 function TaskList() {
   // 🔴 PROBLEM: This component needs to do filtering logic itself
@@ -14,8 +15,8 @@ function TaskList() {
   // 1. Filter by status (all, active, completed)
   // 2. Filter by category (all, work, personal, shopping)
   // 3. Filter by search (check if title or description includes search text)
-  
-  const filteredTasks = tasks.filter(task => {
+
+  const filteredTasks: Task[] = tasks.filter(task => {
     // Status filter
     if (filters.status === 'active' && task.completed) return false;
     if (filters.status === 'completed' && !task.completed) return false;

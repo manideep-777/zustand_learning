@@ -1,6 +1,15 @@
-import { useState } from 'react';
+import { ChangeEvent, FormEvent, useState } from 'react';
 // 🧪 TEMPORARY: Import Zustand store to test it
 import useTaskStore from '../store/taskStore';
+import type { Category, Priority } from '../types';
+
+interface FormData {
+  title: string;
+  description: string;
+  category: Category;
+  priority: Priority;
+  dueDate: string;
+}
 
 function TaskInput() {
     const addTask = useTaskStore((state) => state.addTask);
@@ -12,7 +21,7 @@ function TaskInput() {
     console.log('✅ TaskInput re-rendered - using Zustand selector!');
 
     // ✅ LOCAL STATE: This is fine! Form state should be local
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<FormData>({
         title: '',
         description: '',
         category: 'work',
@@ -24,7 +33,7 @@ function TaskInput() {
     // Requirements:
     // 1. Update formData when user types
     // 2. Handle all input types (text, select, textarea, date)
-    const handleChange = (e) => {
+    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         // YOUR CODE HERE
         // Hint: setFormData(prev => ({ ...prev, [name]: value }))
@@ -38,7 +47,7 @@ function TaskInput() {
     // 2. Validate that title is not empty
     // 3. Call addTask with formData
     // 4. Reset form after submission
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         // YOUR CODE HERE
@@ -46,7 +55,13 @@ function TaskInput() {
         // 2. Call addTask(formData)
         // 3. Reset formData to initial state
         if (formData.title.trim() === '') return;
-        addTask(formData);
+        addTask({
+      title: formData.title,
+      description: formData.description,
+      category: formData.category,
+      priority: formData.priority,
+      dueDate: formData.dueDate ? new Date(formData.dueDate).getTime() : undefined
+    });
         setFormData({
             title: '',
             description: '',
